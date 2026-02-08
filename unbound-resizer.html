@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unbound Compressor - MB to kB</title>
+    <style>
+        :root {
+            --primary-purple: #9b4dca;
+            --success-green: #2ecc71;
+            --text-dark: #2d3748;
+        }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #fff; color: var(--text-dark); text-align: center; }
+        
+        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 15px 5%; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .logo { font-weight: bold; font-size: 22px; display: flex; align-items: center; }
+        .logo-icon { background: var(--primary-purple); color: white; padding: 5px 12px; border-radius: 8px; margin-right: 10px; }
+
+        .main-wrapper { padding: 50px 20px; }
+        .compressor-box { max-width: 800px; margin: 0 auto; padding: 30px; border-radius: 24px; border: 1px solid #edf2f7; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+
+        /* Upload Area with Preview */
+        .drop-zone { border: 2px dashed #cbd5e0; border-radius: 16px; padding: 40px; background: #fcfcfd; cursor: pointer; margin-bottom: 25px; position: relative; }
+        #preview-container { display: none; margin-bottom: 10px; }
+        #image-preview { max-width: 150px; border-radius: 8px; border: 2px solid var(--primary-purple); }
+
+        .controls-row { display: flex; gap: 15px; justify-content: center; margin-bottom: 20px; }
+        .input-group { display: flex; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; width: 300px; }
+        input, select { border: none; padding: 12px; outline: none; }
+        
+        .btn-compress { background: var(--primary-purple); color: white; border: none; padding: 12px 35px; border-radius: 12px; font-weight: bold; cursor: pointer; }
+        
+        /* New Big Download Button */
+        #resultArea { display: none; margin-top: 25px; padding: 20px; border-top: 2px solid #f0f0f0; }
+        .download-btn { display: block; background: var(--success-green); color: white; text-decoration: none; padding: 18px; border-radius: 12px; font-size: 18px; font-weight: bold; box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3); transition: 0.3s; margin-top: 15px; }
+        .download-btn:hover { transform: translateY(-3px); background: #27ae60; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo"><span class="logo-icon">U</span> Unbound Compressor</div>
+    </nav>
+
+    <div class="main-wrapper">
+        <h1>MB to kB Image Compressor</h1>
+        <p>Resize your image size from MB to kB instantly.</p>
+
+        <div class="compressor-box">
+            <div class="drop-zone" onclick="document.getElementById('imageInput').click()">
+                <div id="preview-container">
+                    <img id="image-preview" src="">
+                    <p style="color:var(--success-green); font-weight:bold;">✓ Image Selected</p>
+                </div>
+                <div id="upload-msg">
+                    <span style="font-size:40px;">☁️</span>
+                    <p>Drop your images here, or <span style="color:var(--primary-purple); font-weight:bold;">browse</span></p>
+                </div>
+                <input type="file" id="imageInput" hidden accept="image/*">
+            </div>
+
+            <div class="controls-row">
+                <div class="input-group">
+                    <input type="number" id="targetSize" placeholder="Target Size (e.g. 20)">
+                    <select><option>kB</option></select>
+                </div>
+                <button class="btn-compress" onclick="startCompression()">Compress</button>
+            </div>
+
+            <div id="resultArea">
+                <p style="color: #276749;">Success! Your image is ready.</p>
+                <a id="downloadLink" class="download-btn" href="#">⬇ DOWNLOAD COMPRESSED IMAGE</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const imageInput = document.getElementById('imageInput');
+        const previewContainer = document.getElementById('preview-container');
+        const imagePreview = document.getElementById('image-preview');
+        const uploadMsg = document.getElementById('upload-msg');
+
+        // Show Preview when file is selected
+        imageInput.onchange = function() {
+            const file = imageInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                    previewContainer.style.display = "block";
+                    uploadMsg.style.display = "none";
+                }
+                reader.readAsDataURL(file);
+            }
+        };
+
+        function startCompression() {
+            const file = imageInput.files[0];
+            if (!file) { alert("Please upload an image!"); return; }
+
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (e) => {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    canvas.getContext('2d').drawImage(img, 0, 0);
+                    
+                    const newDataUrl = canvas.toDataURL('image/jpeg', 0.6);
+                    document.getElementById('resultArea').style.display = "block";
+                    document.getElementById('downloadLink').href = newDataUrl;
+                    document.getElementById('downloadLink').download = "unbound-compressed.jpg";
+                    
+                    // Smooth scroll to download button
+                    document.getElementById('resultArea').scrollIntoView({ behavior: 'smooth' });
+                };
+            };
+        }
+    </script>
+</body>
+</html>
