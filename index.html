@@ -1,125 +1,119 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unbound Compressor - MB to kB</title>
+    <title>Unbound Compressor - Smart Image Resizer</title>
     <style>
-        :root {
-            --primary-purple: #9b4dca;
-            --success-green: #2ecc71;
-            --text-dark: #2d3748;
-        }
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #fff; color: var(--text-dark); text-align: center; }
-        
-        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 15px 5%; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .logo { font-weight: bold; font-size: 22px; display: flex; align-items: center; }
-        .logo-icon { background: var(--primary-purple); color: white; padding: 5px 12px; border-radius: 8px; margin-right: 10px; }
-
-        .main-wrapper { padding: 50px 20px; }
-        .compressor-box { max-width: 800px; margin: 0 auto; padding: 30px; border-radius: 24px; border: 1px solid #edf2f7; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-
-        /* Upload Area with Preview */
-        .drop-zone { border: 2px dashed #cbd5e0; border-radius: 16px; padding: 40px; background: #fcfcfd; cursor: pointer; margin-bottom: 25px; position: relative; }
-        #preview-container { display: none; margin-bottom: 10px; }
-        #image-preview { max-width: 150px; border-radius: 8px; border: 2px solid var(--primary-purple); }
-
-        .controls-row { display: flex; gap: 15px; justify-content: center; margin-bottom: 20px; }
-        .input-group { display: flex; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; width: 300px; }
-        input, select { border: none; padding: 12px; outline: none; }
-        
-        .btn-compress { background: var(--primary-purple); color: white; border: none; padding: 12px 35px; border-radius: 12px; font-weight: bold; cursor: pointer; }
-        
-        /* New Big Download Button */
-        #resultArea { display: none; margin-top: 25px; padding: 20px; border-top: 2px solid #f0f0f0; }
-        .download-btn { display: block; background: var(--success-green); color: white; text-decoration: none; padding: 18px; border-radius: 12px; font-size: 18px; font-weight: bold; box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3); transition: 0.3s; margin-top: 15px; }
-        .download-btn:hover { transform: translateY(-3px); background: #27ae60; }
+        :root { --primary: #9b4dca; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        .header { background: var(--primary); color: white; width: 100%; padding: 15px 0; text-align: center; font-size: 24px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .container { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 90%; max-width: 500px; margin-top: 30px; text-align: center; }
+        .upload-box { border: 2px dashed var(--primary); padding: 20px; border-radius: 10px; cursor: pointer; margin-bottom: 20px; transition: 0.3s; }
+        .upload-box:hover { background: #f0e6f7; }
+        input[type="file"] { display: none; }
+        .controls { display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 20px; }
+        input[type="number"] { width: 80px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 16px; }
+        select { padding: 10px; border-radius: 5px; border: 1px solid #ddd; }
+        button { background: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 5px; font-size: 16px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.3s; }
+        button:hover { background: #823db1; transform: translateY(-2px); }
+        #preview { max-width: 100%; border-radius: 10px; margin-top: 20px; display: none; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .status { margin-top: 15px; color: #2ecc71; font-weight: bold; display: none; }
+        .footer { margin-top: auto; padding: 20px; color: #666; font-size: 14px; }
     </style>
 </head>
 <body>
 
-    <nav class="navbar">
-        <div class="logo"><span class="logo-icon">U</span> Unbound Compressor</div>
-    </nav>
+<div class="header">U Unbound Compressor</div>
 
-    <div class="main-wrapper">
-        <h1>MB to kB Image Compressor</h1>
-        <p>Resize your image size from MB to kB instantly.</p>
-
-        <div class="compressor-box">
-            <div class="drop-zone" onclick="document.getElementById('imageInput').click()">
-                <div id="preview-container">
-                    <img id="image-preview" src="">
-                    <p style="color:var(--success-green); font-weight:bold;">✓ Image Selected</p>
-                </div>
-                <div id="upload-msg">
-                    <span style="font-size:40px;">☁️</span>
-                    <p>Drop your images here, or <span style="color:var(--primary-purple); font-weight:bold;">browse</span></p>
-                </div>
-                <input type="file" id="imageInput" hidden accept="image/*">
-            </div>
-
-            <div class="controls-row">
-                <div class="input-group">
-                    <input type="number" id="targetSize" placeholder="Target Size (e.g. 20)">
-                    <select><option>kB</option></select>
-                </div>
-                <button class="btn-compress" onclick="startCompression()">Compress</button>
-            </div>
-
-            <div id="resultArea">
-                <p style="color: #276749;">Success! Your image is ready.</p>
-                <a id="downloadLink" class="download-btn" href="#">⬇ DOWNLOAD COMPRESSED IMAGE</a>
-            </div>
-        </div>
+<div class="container">
+    <div class="upload-box" onclick="document.getElementById('fileInput').click()">
+        <p id="fileName">फोटो चुनें या यहाँ खींचें</p>
+        <input type="file" id="fileInput" accept="image/*">
     </div>
 
-    <script>
-        const imageInput = document.getElementById('imageInput');
-        const previewContainer = document.getElementById('preview-container');
-        const imagePreview = document.getElementById('image-preview');
-        const uploadMsg = document.getElementById('upload-msg');
+    <div class="controls">
+        <label>टारगेट साइज:</label>
+        <input type="number" id="targetSize" value="20" min="1">
+        <select id="unit">
+            <option value="kb">KB</option>
+            <option value="mb">MB</option>
+        </select>
+    </div>
 
-        // Show Preview when file is selected
-        imageInput.onchange = function() {
-            const file = imageInput.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    imagePreview.src = e.target.result;
-                    previewContainer.style.display = "block";
-                    uploadMsg.style.display = "none";
-                }
-                reader.readAsDataURL(file);
-            }
-        };
+    <button onclick="compressImage()">Compress Photo</button>
 
-        function startCompression() {
-            const file = imageInput.files[0];
-            if (!file) { alert("Please upload an image!"); return; }
+    <div id="status" class="status"></div>
+    <img id="preview">
+    <button id="downloadBtn" style="display:none; margin-top:15px; background: #27ae60;">Download Compressed Image</button>
+</div>
 
+<div class="footer">Created by Shivam | Unbound Safar</div>
+
+<script>
+    const fileInput = document.getElementById('fileInput');
+    const fileName = document.getElementById('fileName');
+    const preview = document.getElementById('preview');
+    const status = document.getElementById('status');
+    const downloadBtn = document.getElementById('downloadBtn');
+    let originalImage = null;
+
+    fileInput.onchange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            fileName.innerText = file.name;
             const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = (e) => {
-                const img = new Image();
-                img.src = e.target.result;
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = img.width;
-                    canvas.height = img.height;
-                    canvas.getContext('2d').drawImage(img, 0, 0);
-                    
-                    const newDataUrl = canvas.toDataURL('image/jpeg', 0.6);
-                    document.getElementById('resultArea').style.display = "block";
-                    document.getElementById('downloadLink').href = newDataUrl;
-                    document.getElementById('downloadLink').download = "unbound-compressed.jpg";
-                    
-                    // Smooth scroll to download button
-                    document.getElementById('resultArea').scrollIntoView({ behavior: 'smooth' });
-                };
+            reader.onload = (event) => {
+                originalImage = new Image();
+                originalImage.src = event.target.result;
+                originalImage.onload = () => {
+                    preview.src = originalImage.src;
+                    preview.style.display = 'inline-block';
+                }
             };
+            reader.readAsDataURL(file);
         }
-    </script>
-</body>
+    };
 
+    async function compressImage() {
+        if (!originalImage) { alert("कृपया पहले फोटो चुनें!"); return; }
+
+        const targetKB = document.getElementById('targetSize').value * (document.getElementById('unit').value === 'mb' ? 1024 : 1);
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        let width = originalImage.width;
+        let height = originalImage.height;
+        canvas.width = width;
+        canvas.height = height;
+        ctx.drawImage(originalImage, 0, 0, width, height);
+
+        let quality = 0.9;
+        let compressedBlob = null;
+        
+        status.innerText = "Processing...";
+        status.style.display = 'block';
+
+        // Iterative compression to hit the target size
+        for (let i = 0; i < 10; i++) {
+            compressedBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', quality));
+            if (compressedBlob.size / 1024 <= targetKB || quality <= 0.1) break;
+            quality -= 0.15; // Reduce quality if size is too big
+        }
+
+        const url = URL.createObjectURL(compressedBlob);
+        preview.src = url;
+        status.innerText = `Success! Size: ${(compressedBlob.size / 1024).toFixed(2)} KB`;
+        
+        downloadBtn.style.display = 'block';
+        downloadBtn.onclick = () => {
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `unbound_${fileName.innerText}`;
+            link.click();
+        };
+    }
+</script>
+
+</body>
 </html>
