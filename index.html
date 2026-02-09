@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unbound Compressor | MB to kB Image Resizer for All Exams</title>
-    <meta name="description" content="SSC, UPSC, Railway, Police और सभी सरकारी परीक्षाओं के लिए सबसे तेज़ MB to kB इमेज कंप्रेसर।">
+    <title>MB to kB Image Compressor | Unbound Compressor</title>
+    <meta name="description" content="सबसे तेज़ MB to kB इमेज कंप्रेसर। अपनी फोटो को 20kb, 50kb या 100kb में बदलें। SSC, UPSC, Railway और सभी सरकारी परीक्षाओं के लिए बेस्ट।">
+    <meta name="keywords" content="MB to kB, image compressor, photo resizer, 20kb photo converter, online image resizer, mb to kb converter">
+    
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #9b4dca; --bg: #f4f4f9; }
@@ -27,7 +29,7 @@
 </head>
 <body>
 
-<div class="navbar">🟣 Unbound Compressor</div>
+<div class="navbar">🟣 Unbound Compressor | MB to kB Converter</div>
 
 <div class="container">
     <div class="upload-area" onclick="document.getElementById('fileInput').click()">
@@ -37,9 +39,8 @@
     </div>
 
     <div class="input-group">
-        <span>साइज:</span>
+        <span>साइज (kB):</span>
         <input type="number" id="targetSize" value="20">
-        <select id="unit"><option value="kb">KB</option></select>
     </div>
 
     <button class="btn-compress" onclick="compressImage()">Compress Now</button>
@@ -83,11 +84,11 @@
         
         let width = originalImage.width;
         let height = originalImage.height;
-        let quality = 0.9;
+        let quality = 0.95;
         let blob;
 
-        // यह लूप साइज़ और क्वालिटी दोनों को कंट्रोल करेगा
-        for (let i = 0; i < 15; i++) {
+        // यह लूप तब तक चलेगा जब तक साइज़ आपके मांगे गए KB से कम न हो जाए
+        for (let i = 0; i < 30; i++) {
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
             canvas.width = width;
@@ -95,19 +96,17 @@
             ctx.drawImage(originalImage, 0, 0, width, height);
 
             blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', quality));
-            
-            // अगर साइज़ मांगे गए KB से कम हो जाए, तो रुक जाओ
             if (blob.size / 1024 <= targetKB) break;
 
-            // साइज़ अभी भी बड़ा है, तो थोड़ा और छोटा करो
-            width *= 0.85;
-            height *= 0.85;
+            // अगर साइज़ अभी भी बड़ा है, तो थोड़ा और छोटा करो
+            width *= 0.9;
+            height *= 0.9;
             quality -= 0.05;
             if (quality < 0.1) quality = 0.1;
         }
 
         const url = URL.createObjectURL(blob);
-        status.innerText = `Success! Size: ${(blob.size / 1024).toFixed(2)} KB`;
+        status.innerText = `तैयार है! साइज: ${(blob.size / 1024).toFixed(2)} KB`;
         status.style.display = 'block';
         downloadBtn.style.display = 'block';
         downloadBtn.onclick = () => {
