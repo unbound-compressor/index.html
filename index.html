@@ -4,32 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MB to kB Image Compressor | Unbound Compressor</title>
-    <meta name="description" content="सबसे तेज़ MB to kB इमेज कंप्रेसर। अपनी फोटो को 20kb, 50kb या 100kb में बदलें। SSC, UPSC, Railway और सभी सरकारी परीक्षाओं के लिए बेस्ट।">
-    <meta name="keywords" content="MB to kB, image compressor, photo resizer, 20kb photo converter, online image resizer, mb to kb converter">
+    <meta name="description" content="सभी परीक्षाओं के लिए सबसे तेज़ MB to kB इमेज कंप्रेसर। अपनी फोटो को तुरंत 20kb या 50kb में बदलें।">
+    <meta name="keywords" content="MB to kB, image compressor, photo resizer, 20kb converter">
     
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #9b4dca; --bg: #f4f4f9; }
         body { font-family: 'Poppins', sans-serif; background: var(--bg); margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        
+        /* आपका पुराना पर्पल नेवबार */
         .navbar { background: white; width: 100%; padding: 15px 0; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); color: var(--primary); font-weight: 600; font-size: 20px; }
+        
+        /* स्क्रीनशॉट जैसा व्हाइट कार्ड */
         .container { background: white; width: 90%; max-width: 450px; margin: 40px auto; padding: 25px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); text-align: center; }
+        
         .upload-area { border: 2px dashed #ddd; border-radius: 12px; padding: 20px; cursor: pointer; transition: 0.3s; min-height: 120px; display: flex; align-items: center; justify-content: center; flex-direction: column; background: #fff; }
         .upload-area:hover { border-color: var(--primary); background: #fdf8ff; }
+        
         #preview { max-width: 100px; max-height: 100px; border-radius: 8px; display: none; margin-bottom: 10px; border: 1px solid #eee; }
+        
         .input-group { margin: 25px 0; display: flex; justify-content: center; gap: 10px; align-items: center; }
         input[type="number"] { width: 60px; padding: 8px; border: 1px solid #ddd; border-radius: 6px; text-align: center; font-family: inherit; }
         select { padding: 8px; border-radius: 6px; border: 1px solid #ddd; font-family: inherit; }
+
+        /* आपके स्क्रीनशॉट वाले पर्पल बटन्स */
         .btn-compress { background: var(--primary); color: white; border: none; padding: 14px; border-radius: 10px; width: 100%; font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.2s; }
         .btn-compress:active { transform: scale(0.96); } 
+        
         .success-msg { color: #27ae60; background: #eafaf1; padding: 10px; border-radius: 8px; margin-top: 15px; display: none; font-size: 14px; font-weight: 600; }
+        
         .btn-download { background: #333; color: white; border: none; padding: 12px; border-radius: 10px; width: 100%; margin-top: 10px; display: none; cursor: pointer; font-weight: 500; font-family: inherit; }
+
         .exam-tags { font-size: 11px; color: #888; margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px; }
         .footer { margin-top: auto; padding: 20px; color: #888; font-size: 13px; }
     </style>
 </head>
 <body>
 
-<div class="navbar">🟣 Unbound Compressor | MB to kB Converter</div>
+<div class="navbar">🟣 Unbound Compressor | MB to kB</div>
 
 <div class="container">
     <div class="upload-area" onclick="document.getElementById('fileInput').click()">
@@ -87,7 +99,7 @@
         let quality = 0.95;
         let blob;
 
-        // यह लूप तब तक चलेगा जब तक साइज़ आपके मांगे गए KB से कम न हो जाए
+        // यह लूप साइज़ को कंट्रोल करेगा
         for (let i = 0; i < 30; i++) {
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
@@ -98,7 +110,6 @@
             blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', quality));
             if (blob.size / 1024 <= targetKB) break;
 
-            // अगर साइज़ अभी भी बड़ा है, तो थोड़ा और छोटा करो
             width *= 0.9;
             height *= 0.9;
             quality -= 0.05;
@@ -106,7 +117,7 @@
         }
 
         const url = URL.createObjectURL(blob);
-        status.innerText = `तैयार है! साइज: ${(blob.size / 1024).toFixed(2)} KB`;
+        status.innerText = `Success! Size: ${(blob.size / 1024).toFixed(2)} KB`;
         status.style.display = 'block';
         downloadBtn.style.display = 'block';
         downloadBtn.onclick = () => {
