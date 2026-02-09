@@ -15,13 +15,13 @@
         #preview { max-width: 100px; max-height: 100px; border-radius: 8px; display: none; margin-bottom: 10px; animation: popIn 0.3s ease; border: 1px solid #eee; }
         @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         .input-group { margin: 25px 0; display: flex; justify-content: center; gap: 10px; align-items: center; }
-        input[type="number"] { width: 60px; padding: 8px; border: 1px solid #ddd; border-radius: 6px; text-align: center; }
-        select { padding: 8px; border-radius: 6px; border: 1px solid #ddd; }
+        input[type="number"] { width: 60px; padding: 8px; border: 1px solid #ddd; border-radius: 6px; text-align: center; font-family: inherit; }
+        select { padding: 8px; border-radius: 6px; border: 1px solid #ddd; font-family: inherit; }
         .btn-compress { background: var(--primary); color: white; border: none; padding: 14px; border-radius: 10px; width: 100%; font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.2s; }
         .btn-compress:active { transform: scale(0.96); } 
         .success-msg { color: #27ae60; background: #eafaf1; padding: 10px; border-radius: 8px; margin-top: 15px; display: none; font-size: 14px; animation: slideUp 0.4s ease; font-weight: 600; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .btn-download { background: #333; color: white; border: none; padding: 12px; border-radius: 10px; width: 100%; margin-top: 10px; display: none; cursor: pointer; font-weight: 500; }
+        .btn-download { background: #333; color: white; border: none; padding: 12px; border-radius: 10px; width: 100%; margin-top: 10px; display: none; cursor: pointer; font-weight: 500; font-family: inherit; }
         .footer { margin-top: auto; padding: 20px; color: #888; font-size: 13px; }
     </style>
 </head>
@@ -82,10 +82,10 @@
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
 
-        // अगर फोटो बहुत बड़ी है, तो उसे पहले थोड़ा छोटा (Resize) करते हैं
         let width = originalImage.width;
         let height = originalImage.height;
-        const max_dim = 1200; 
+        
+        const max_dim = 1600; 
         if (width > max_dim || height > max_dim) {
             if (width > height) { height *= max_dim / width; width = max_dim; }
             else { width *= max_dim / height; height = max_dim; }
@@ -95,14 +95,17 @@
         canvas.height = height;
         ctx.drawImage(originalImage, 0, 0, width, height);
 
-        let quality = 0.8;
+        let quality = 0.98; 
         let blob;
         
-        // यह लूप तब तक चलेगा जब तक साइज़ आपके मांगे गए KB से कम न हो जाए
-        for (let i = 0; i < 15; i++) {
+        for (let i = 0; i < 40; i++) { 
             blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', quality));
-            if (blob.size / 1024 <= targetKB || quality <= 0.05) break;
-            quality -= 0.1; 
+            let currentSizeKB = blob.size / 1024;
+            
+            if (currentSizeKB <= targetKB) break;
+            
+            quality -= 0.02; 
+            if (quality <= 0.05) break;
         }
 
         const url = URL.createObjectURL(blob);
@@ -119,3 +122,4 @@
 </script>
 </body>
 </html>
+
