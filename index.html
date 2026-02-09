@@ -3,57 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unbound Compressor - Smart Image Resizer</title>
+    <title>Unbound Compressor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #9b4dca; --bg: #f4f7f6; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        .header { background: var(--primary); color: white; width: 100%; padding: 15px 0; text-align: center; font-size: 24px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .container { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 90%; max-width: 500px; margin-top: 30px; text-align: center; }
-        .upload-box { border: 2px dashed var(--primary); padding: 20px; border-radius: 10px; cursor: pointer; margin-bottom: 20px; transition: 0.3s; }
-        .upload-box:hover { background: #f0e6f7; }
-        input[type="file"] { display: none; }
-        .controls { display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 20px; }
-        input[type="number"] { width: 80px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 16px; }
-        select { padding: 10px; border-radius: 5px; border: 1px solid #ddd; }
-        button { background: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 5px; font-size: 16px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.3s; }
-        button:hover { background: #823db1; transform: translateY(-2px); }
-        #preview { max-width: 100%; border-radius: 10px; margin-top: 20px; display: none; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .status { margin-top: 15px; color: #2ecc71; font-weight: bold; display: none; }
-        .footer { margin-top: auto; padding: 20px; color: #666; font-size: 14px; }
+        :root { --primary: #9b4dca; --bg: #f4f4f9; }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); margin: 0; display: flex; flex-direction: column; align-items: center; }
+        
+        .navbar { background: white; width: 100%; padding: 15px 0; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); color: var(--primary); font-weight: 600; font-size: 20px; }
+        
+        .container { background: white; width: 90%; max-width: 450px; margin-top: 30px; padding: 25px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); text-align: center; }
+
+        /* अपलोड बॉक्स और फोटो प्रीव्यू */
+        .upload-area { border: 2px dashed #ddd; border-radius: 12px; padding: 20px; cursor: pointer; transition: 0.3s; position: relative; overflow: hidden; min-height: 100px; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        .upload-area:hover { border-color: var(--primary); background: #fdf8ff; }
+        
+        #preview { max-width: 100px; max-height: 100px; border-radius: 8px; display: none; margin-bottom: 10px; animation: popIn 0.3s ease; }
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        .input-group { margin: 25px 0; display: flex; justify-content: center; gap: 10px; align-items: center; }
+        input[type="number"] { width: 60px; padding: 8px; border: 1px solid #ddd; border-radius: 6px; }
+        select { padding: 8px; border-radius: 6px; border: 1px solid #ddd; }
+
+        /* बटन एनीमेशन */
+        .btn-compress { background: var(--primary); color: white; border: none; padding: 14px; border-radius: 10px; width: 100%; font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .btn-compress:active { transform: scale(0.96); } 
+
+        .success-msg { color: #27ae60; background: #eafaf1; padding: 10px; border-radius: 8px; margin-top: 15px; display: none; font-size: 14px; animation: slideUp 0.4s ease; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .btn-download { background: #333; color: white; border: none; padding: 12px; border-radius: 10px; width: 100%; margin-top: 10px; display: none; cursor: pointer; }
+        
+        .footer { margin-top: 30px; color: #888; font-size: 13px; }
     </style>
 </head>
 <body>
 
-<div class="header">U Unbound Compressor</div>
+<div class="navbar">🟣 Unbound Compressor</div>
 
 <div class="container">
-    <div class="upload-box" onclick="document.getElementById('fileInput').click()">
-        <p id="fileName">फोटो चुनें या यहाँ खींचें</p>
-        <input type="file" id="fileInput" accept="image/*">
+    <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+        <img id="preview">
+        <span id="fileName" style="font-size: 14px; color: #666;">फोटो चुनें (Max 100KB)</span>
+        <input type="file" id="fileInput" hidden accept="image/*">
     </div>
 
-    <div class="controls">
-        <label>टारगेट साइज:</label>
-        <input type="number" id="targetSize" value="20" min="1">
-        <select id="unit">
-            <option value="kb">KB</option>
-            <option value="mb">MB</option>
-        </select>
+    <div class="input-group">
+        <span>साइज:</span>
+        <input type="number" id="targetSize" value="20">
+        <select id="unit"><option value="kb">KB</option></select>
     </div>
 
-    <button onclick="compressImage()">Compress Photo</button>
+    <button class="btn-compress" onclick="compressImage()">Compress Now</button>
 
-    <div id="status" class="status"></div>
-    <img id="preview">
-    <button id="downloadBtn" style="display:none; margin-top:15px; background: #27ae60;">Download Compressed Image</button>
+    <div id="status" class="success-msg"></div>
+    <button id="downloadBtn" class="btn-download">Download Image</button>
 </div>
 
-<div class="footer">Created by Shivam | Unbound Safar</div>
+<div class="footer">बनाया गया है <b>शिवम</b> द्वारा | <b>Unbound Safar</b></div>
 
 <script>
     const fileInput = document.getElementById('fileInput');
-    const fileName = document.getElementById('fileName');
     const preview = document.getElementById('preview');
+    const fileName = document.getElementById('fileName');
     const status = document.getElementById('status');
     const downloadBtn = document.getElementById('downloadBtn');
     let originalImage = null;
@@ -68,7 +79,7 @@
                 originalImage.src = event.target.result;
                 originalImage.onload = () => {
                     preview.src = originalImage.src;
-                    preview.style.display = 'inline-block';
+                    preview.style.display = 'block';
                 }
             };
             reader.readAsDataURL(file);
@@ -76,41 +87,31 @@
     };
 
     async function compressImage() {
-        if (!originalImage) { alert("कृपया पहले फोटो चुनें!"); return; }
-
-        const targetKB = document.getElementById('targetSize').value * (document.getElementById('unit').value === 'mb' ? 1024 : 1);
+        if (!originalImage) { alert("फोटो चुनें!"); return; }
+        const targetKB = document.getElementById('targetSize').value;
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-
-        let width = originalImage.width;
-        let height = originalImage.height;
-        canvas.width = width;
-        canvas.height = height;
-        ctx.drawImage(originalImage, 0, 0, width, height);
+        canvas.width = originalImage.width;
+        canvas.height = originalImage.height;
+        ctx.drawImage(originalImage, 0, 0, canvas.width, canvas.height);
 
         let quality = 0.9;
-        let compressedBlob = null;
-        
-        status.innerText = "Processing...";
-        status.style.display = 'block';
-
-        // Iterative compression to hit the target size
-        for (let i = 0; i < 10; i++) {
-            compressedBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', quality));
-            if (compressedBlob.size / 1024 <= targetKB || quality <= 0.1) break;
-            quality -= 0.15; // Reduce quality if size is too big
+        let blob;
+        for (let i = 0; i < 8; i++) {
+            blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', quality));
+            if (blob.size / 1024 <= targetKB || quality <= 0.1) break;
+            quality -= 0.15;
         }
 
-        const url = URL.createObjectURL(compressedBlob);
-        preview.src = url;
-        status.innerText = `Success! Size: ${(compressedBlob.size / 1024).toFixed(2)} KB`;
-        
+        const url = URL.createObjectURL(blob);
+        status.innerText = `Success! Size: ${(blob.size / 1024).toFixed(2)} KB`;
+        status.style.display = 'block';
         downloadBtn.style.display = 'block';
         downloadBtn.onclick = () => {
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `unbound_${fileName.innerText}`;
-            link.click();
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `unbound_${fileInput.files[0].name}`;
+            a.click();
         };
     }
 </script>
