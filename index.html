@@ -7,22 +7,39 @@
     <meta name="description" content="SSC, UPSC, Railway, Police और सभी सरकारी परीक्षाओं के लिए सबसे तेज़ MB to kB इमेज कंप्रेसर। अपनी फोटो और साइन को तुरंत सही साइज में बदलें।">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #9b4dca; --bg: #f4f4f9; }
+        :root { --primary: #9b4dca; --bg: #f4f4f9; --secondary: #6c5ce7; }
         body { font-family: 'Poppins', sans-serif; background: var(--bg); margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         .navbar { background: white; width: 100%; padding: 15px 0; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); color: var(--primary); font-weight: 600; font-size: 20px; }
-        .container { background: white; width: 90%; max-width: 450px; margin: 40px auto; padding: 25px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); text-align: center; }
+        .container { background: white; width: 90%; max-width: 450px; margin: 30px auto; padding: 25px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); text-align: center; position: relative; }
+        
+        /* फ़ॉर्मूला बॉक्स स्टाइल */
+        .info-badge { background: #f0e6f7; color: var(--primary); font-size: 12px; padding: 5px 15px; border-radius: 20px; display: inline-block; margin-bottom: 15px; font-weight: 600; }
+
         .upload-area { border: 2px dashed #ddd; border-radius: 12px; padding: 20px; cursor: pointer; transition: 0.3s; min-height: 120px; display: flex; align-items: center; justify-content: center; flex-direction: column; background: #fff; }
-        .upload-area:hover { border-color: var(--primary); background: #fdf8ff; }
-        #preview { max-width: 100px; max-height: 100px; border-radius: 8px; display: none; margin-bottom: 10px; border: 1px solid #eee; }
+        .upload-area:hover { border-color: var(--primary); background: #fdf8ff; transform: scale(1.01); }
+        
+        #preview { max-width: 100px; max-height: 100px; border-radius: 8px; display: none; margin-bottom: 10px; border: 1px solid #eee; animation: popIn 0.3s ease; }
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
         .input-group { margin: 25px 0; display: flex; justify-content: center; gap: 10px; align-items: center; }
         input[type="number"] { width: 60px; padding: 8px; border: 1px solid #ddd; border-radius: 6px; text-align: center; font-family: inherit; }
-        select { padding: 8px; border-radius: 6px; border: 1px solid #ddd; font-family: inherit; }
+        
+        .btn-group { display: flex; gap: 10px; flex-direction: column; }
         .btn-compress { background: var(--primary); color: white; border: none; padding: 14px; border-radius: 10px; width: 100%; font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.2s; }
         .btn-compress:active { transform: scale(0.96); } 
-        .success-msg { color: #27ae60; background: #eafaf1; padding: 10px; border-radius: 8px; margin-top: 15px; display: none; font-size: 14px; font-weight: 600; }
-        .btn-download { background: #333; color: white; border: none; padding: 12px; border-radius: 10px; width: 100%; margin-top: 10px; display: none; cursor: pointer; font-weight: 500; font-family: inherit; }
-        .exam-tags { font-size: 11px; color: #888; margin-top: 15px; }
-        .footer { margin-top: auto; padding: 20px; color: #888; font-size: 13px; }
+        
+        /* रीसेट बटन स्टाइल */
+        .btn-reset { background: #f1f1f1; color: #666; border: none; padding: 10px; border-radius: 8px; font-size: 14px; cursor: pointer; transition: 0.2s; margin-top: 10px; }
+        .btn-reset:hover { background: #e0e0e0; }
+
+        .success-msg { color: #27ae60; background: #eafaf1; padding: 10px; border-radius: 8px; margin-top: 15px; display: none; font-size: 14px; font-weight: 600; animation: slideUp 0.4s ease; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .btn-download { background: #333; color: white; border: none; padding: 12px; border-radius: 10px; width: 100%; margin-top: 10px; display: none; cursor: pointer; font-weight: 500; font-family: inherit; transition: 0.3s; }
+        .btn-download:hover { background: #000; }
+
+        .exam-tags { font-size: 11px; color: #888; margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px; }
+        .footer { margin-top: auto; padding: 20px; color: #888; font-size: 13px; text-align: center; }
     </style>
 </head>
 <body>
@@ -30,18 +47,23 @@
 <div class="navbar">🟣 Unbound Compressor</div>
 
 <div class="container">
-    <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+    <div class="info-badge">Formula: 1 MB = 1000 KB</div>
+    
+    <div class="upload-area" id="dropZone" onclick="document.getElementById('fileInput').click()">
         <img id="preview">
         <span id="fileName" style="font-size: 14px; color: #666; word-break: break-all;">फोटो या सिग्नेचर चुनें</span>
         <input type="file" id="fileInput" hidden accept="image/*">
     </div>
 
     <div class="input-group">
-        <span>साइज (kB):</span>
+        <span>टारगेट साइज (kB):</span>
         <input type="number" id="targetSize" value="20">
     </div>
 
-    <button class="btn-compress" onclick="compressImage()">Compress Now</button>
+    <div class="btn-group">
+        <button class="btn-compress" onclick="compressImage()">Compress Now</button>
+        <button class="btn-reset" onclick="resetTool()">Reset</button>
+    </div>
 
     <div id="status" class="success-msg"></div>
     <button id="downloadBtn" class="btn-download">Download Image</button>
@@ -76,6 +98,16 @@
         }
     };
 
+    function resetTool() {
+        fileInput.value = "";
+        preview.src = "";
+        preview.style.display = 'none';
+        fileName.innerText = "फोटो या सिग्नेचर चुनें";
+        status.style.display = 'none';
+        downloadBtn.style.display = 'none';
+        originalImage = null;
+    }
+
     async function compressImage() {
         if (!originalImage) { alert("कृपया फोटो चुनें!"); return; }
         const targetKB = parseFloat(document.getElementById('targetSize').value);
@@ -96,7 +128,7 @@
 
         let quality = 0.98; 
         let blob;
-        for (let i = 0; i < 40; i++) { 
+        for (let i = 0; i < 45; i++) { 
             blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', quality));
             if (blob.size / 1024 <= targetKB) break;
             quality -= 0.02; 
