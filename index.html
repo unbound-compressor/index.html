@@ -12,16 +12,14 @@
         .container { background: white; width: 90%; max-width: 450px; margin: 40px auto; padding: 25px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); text-align: center; }
         .upload-area { border: 2px dashed #ddd; border-radius: 12px; padding: 20px; cursor: pointer; transition: 0.3s; min-height: 120px; display: flex; align-items: center; justify-content: center; flex-direction: column; background: #fff; }
         .upload-area:hover { border-color: var(--primary); background: #fdf8ff; }
-        #preview { max-width: 100px; max-height: 100px; border-radius: 8px; display: none; margin-bottom: 10px; animation: popIn 0.3s ease; border: 1px solid #eee; }
-        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        #preview { max-width: 100px; max-height: 100px; border-radius: 8px; display: none; margin-bottom: 10px; border: 1px solid #eee; }
         .input-group { margin: 25px 0; display: flex; justify-content: center; gap: 10px; align-items: center; }
-        input[type="number"] { width: 60px; padding: 8px; border: 1px solid #ddd; border-radius: 6px; text-align: center; font-family: inherit; }
-        select { padding: 8px; border-radius: 6px; border: 1px solid #ddd; font-family: inherit; }
+        input[type="number"] { width: 60px; padding: 8px; border: 1px solid #ddd; border-radius: 6px; text-align: center; }
+        select { padding: 8px; border-radius: 6px; border: 1px solid #ddd; }
         .btn-compress { background: var(--primary); color: white; border: none; padding: 14px; border-radius: 10px; width: 100%; font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.2s; }
         .btn-compress:active { transform: scale(0.96); } 
-        .success-msg { color: #27ae60; background: #eafaf1; padding: 10px; border-radius: 8px; margin-top: 15px; display: none; font-size: 14px; animation: slideUp 0.4s ease; font-weight: 600; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .btn-download { background: #333; color: white; border: none; padding: 12px; border-radius: 10px; width: 100%; margin-top: 10px; display: none; cursor: pointer; font-weight: 500; font-family: inherit; }
+        .success-msg { color: #27ae60; background: #eafaf1; padding: 10px; border-radius: 8px; margin-top: 15px; display: none; font-size: 14px; font-weight: 600; }
+        .btn-download { background: #333; color: white; border: none; padding: 12px; border-radius: 10px; width: 100%; margin-top: 10px; display: none; cursor: pointer; font-weight: 500; }
         .footer { margin-top: auto; padding: 20px; color: #888; font-size: 13px; }
     </style>
 </head>
@@ -76,16 +74,16 @@
     };
 
     async function compressImage() {
-        if (!originalImage) { alert("कृपया फोटो चुनें!"); return; }
+        if (!originalImage) { alert("फोटो चुनें!"); return; }
         
         const targetKB = parseFloat(document.getElementById('targetSize').value);
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
 
+        // फोटो को जरूरत के हिसाब से रिसाइज करना ताकि क्वालिटी बनी रहे
         let width = originalImage.width;
         let height = originalImage.height;
-        
-        const max_dim = 1600; 
+        const max_dim = 1200; 
         if (width > max_dim || height > max_dim) {
             if (width > height) { height *= max_dim / width; width = max_dim; }
             else { width *= max_dim / height; height = max_dim; }
@@ -95,17 +93,14 @@
         canvas.height = height;
         ctx.drawImage(originalImage, 0, 0, width, height);
 
-        let quality = 0.98; 
+        let quality = 0.9;
         let blob;
         
-        for (let i = 0; i < 40; i++) { 
+        // यह लूप बार-बार चेक करेगा जब तक फोटो आपके मांगे गए साइज से छोटी न हो जाए
+        for (let i = 0; i < 20; i++) {
             blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', quality));
-            let currentSizeKB = blob.size / 1024;
-            
-            if (currentSizeKB <= targetKB) break;
-            
-            quality -= 0.02; 
-            if (quality <= 0.05) break;
+            if (blob.size / 1024 <= targetKB || quality <= 0.05) break;
+            quality -= 0.1; 
         }
 
         const url = URL.createObjectURL(blob);
@@ -122,4 +117,3 @@
 </script>
 </body>
 </html>
-
